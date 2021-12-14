@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Add Transit Gateway and TG Basic Config"
+
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: "VPC Parameters"
+        Parameters:
+          - AvailabilityZoneA
+
+Resources:
+#########################
+# Create-TransitGateWay #
+#########################
+  TransitGatewayIAD:
+    Type: "AWS::EC2::TransitGateway"
+    Properties:
+      AmazonSideAsn: 65002
+      Description: "TGW Route Integration Test"
+      AutoAcceptSharedAttachments: "enable"
+      DefaultRouteTableAssociation: "disable"
+      DefaultRouteTablePropagation: "disable"
+      DnsSupport: "enable"
+      VpnEcmpSupport: "enable"
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}'
+
+####################################
+# Create-TransitGateWay-RouteTable #
+####################################
+
+  TransitGatewayRouteTableToSeoul:
+    Type: "AWS::EC2::TransitGatewayRouteTable"
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-RT-Seoul'
+      TransitGatewayId: !Ref TransitGatewayIAD
+
+##############################################
+# IAD-VPC Connect to the Transit Gateway#
+##############################################
+
+  TransitGatewayAttachmentIADVPC:
+    Type: "AWS::EC2::TransitGatewayAttachment"
+    Properties:
+      SubnetIds:
+        - Fn::ImportValue: !Sub "IAD-VPC-TGWSubnetA"
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Attach-IAD-VPC'
+      TransitGatewayId: !Ref TransitGatewayIAD
+      VpcId:
+        Fn::ImportValue: !Sub "IAD-VPC"
+
+  TransitGatewayRouteTableAssociationIADVPCToSeoul:
+    Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
+    Properties:
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentIADVPC
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTableToSeoul
+      
+
+  TransitGatewayRouteTablePropagationIADVPCToSeoul:
+    Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
+    Properties:
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentIADVPC
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTableToSeoul
+
