@@ -6,7 +6,7 @@ Metadata:
         Parameters:
          - AvailabilityZoneA
          - VPCCIDRBlock
-         - PublicSubnetABlick
+         - PublicSubnetABlock
          - PrivateSubnetABlock
          - TGWSubnetABlock
          - InstanceType
@@ -55,7 +55,7 @@ Parameters:
   KeyPair:
     Description: "Keypair to access the EC2 Instance"
     Type: "AWS::EC2::KeyPair::KeyName"
-    Default: "builders20210312"
+    Default: "mykey"
 
 ##########################
 # Create-AMI: EC2 AMI ID #

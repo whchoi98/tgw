@@ -6,7 +6,7 @@ Metadata:
         Parameters:
          - AvailabilityZoneA
          - VPCCIDRBlock
-         - PublicSubnetABlick
+         - PublicSubnetABlock
          - PrivateSubnetABlock
          - TGWSubnetABlock
          - InstanceType
@@ -24,23 +24,23 @@ Parameters:
 
   VPCCIDRBlock:
     Type: String
-    Default: 10.3.0.0/16
+    Default: 10.53.0.0/16
     Description: "The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range."
 
   PublicSubnetABlock:
     Type: String
-    Default: 10.3.11.0/24
+    Default: 10.53.11.0/24
     Description: "CidrBlock for AZ A public subnet A within the VPC"
 
 
   PrivateSubnetABlock:
     Type: String
-    Default: 10.3.21.0/24
+    Default: 10.53.21.0/24
     Description: "CidrBlock for AZ A private subnet A within the VPC"
  
   TGWSubnetABlock:
     Type: String
-    Default: 10.3.251.0/24
+    Default: 10.53.251.0/24
     Description: "CidrBlock for AZ A TGW subnet A within the VPC"
 
   InstanceType:
@@ -55,7 +55,7 @@ Parameters:
   KeyPair:
     Description: "Keypair to access the EC2 Instance"
     Type: "AWS::EC2::KeyPair::KeyName"
-    Default: "builders20210312"
+    Default: "mykey"
 
 ##########################
 # Create-AMI: EC2 AMI ID #
@@ -382,7 +382,7 @@ Resources:
     Properties:
       SubnetId: !Ref PublicSubnetA
       ImageId: !Ref LatestAmiId
-      PrivateIpAddress: 10.3.11.101
+      PrivateIpAddress: 10.53.11.101
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PublicEC2SG
@@ -390,7 +390,7 @@ Resources:
       IamInstanceProfile: !Ref InstanceProfileSSM
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-Public-10.3.11.101'
+          Value: !Sub '${AWS::StackName}-Public-10.53.11.101'
       UserData:
         Fn::Base64:
           Fn::Sub: |
@@ -419,7 +419,7 @@ Resources:
     Properties:
       SubnetId: !Ref PrivateSubnetA
       ImageId: !Ref LatestAmiId
-      PrivateIpAddress: 10.3.21.101
+      PrivateIpAddress: 10.53.21.101
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
@@ -427,7 +427,7 @@ Resources:
       IamInstanceProfile: !Ref InstanceProfileSSM
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-Private-10.3.21.101'
+          Value: !Sub '${AWS::StackName}-Private-10.53.21.101'
       UserData:
         Fn::Base64:
           Fn::Sub: |

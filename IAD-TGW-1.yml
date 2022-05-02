@@ -21,6 +21,7 @@ Resources:
       AutoAcceptSharedAttachments: "enable"
       DefaultRouteTableAssociation: "disable"
       DefaultRouteTablePropagation: "disable"
+      MulticastSupport: enable
       DnsSupport: "enable"
       VpnEcmpSupport: "enable"
       Tags:

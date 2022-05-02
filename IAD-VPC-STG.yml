@@ -19,28 +19,28 @@ Parameters:
   AvailabilityZoneA:
     Description: "Choose AZ1 for your VPC."
     Type: AWS::EC2::AvailabilityZone::Name
-    Default: "us-east-1a"
+    Default: "ap-northeast-2a"
 
 
   VPCCIDRBlock:
     Type: String
-    Default: 10.51.0.0/16
+    Default: 10.52.0.0/16
     Description: "The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range."
 
   PublicSubnetABlock:
     Type: String
-    Default: 10.51.11.0/24
+    Default: 10.52.11.0/24
     Description: "CidrBlock for AZ A public subnet A within the VPC"
 
 
   PrivateSubnetABlock:
     Type: String
-    Default: 10.51.21.0/24
+    Default: 10.52.21.0/24
     Description: "CidrBlock for AZ A private subnet A within the VPC"
  
   TGWSubnetABlock:
     Type: String
-    Default: 10.51.251.0/24
+    Default: 10.52.251.0/24
     Description: "CidrBlock for AZ A TGW subnet A within the VPC"
 
   InstanceType:
@@ -382,7 +382,7 @@ Resources:
     Properties:
       SubnetId: !Ref PublicSubnetA
       ImageId: !Ref LatestAmiId
-      PrivateIpAddress: 10.51.11.101
+      PrivateIpAddress: 10.52.11.101
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PublicEC2SG
@@ -390,7 +390,7 @@ Resources:
       IamInstanceProfile: !Ref InstanceProfileSSM
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-Public-10.51.11.101'
+          Value: !Sub '${AWS::StackName}-Public-10.52.11.101'
       UserData:
         Fn::Base64:
           Fn::Sub: |
@@ -419,7 +419,7 @@ Resources:
     Properties:
       SubnetId: !Ref PrivateSubnetA
       ImageId: !Ref LatestAmiId
-      PrivateIpAddress: 10.51.21.101
+      PrivateIpAddress: 10.52.21.101
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
@@ -427,7 +427,7 @@ Resources:
       IamInstanceProfile: !Ref InstanceProfileSSM
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-Private-10.51.21.101'
+          Value: !Sub '${AWS::StackName}-Private-10.52.21.101'
       UserData:
         Fn::Base64:
           Fn::Sub: |
