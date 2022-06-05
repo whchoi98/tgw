@@ -52,7 +52,7 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Attach-Seoul-VPC-PART-PRD'
-      TransitGatewayId: !Ref TransitGatewaySeoulPART1
+      TransitGatewayId: !Ref TransitGatewayRouteTablePART1
       VpcId:
         Fn::ImportValue: !Sub "Seoul-VPC-PART-PRD"
 
