@@ -44,7 +44,7 @@ Resources:
 # Seoul-VPC-PART-PRD Connect to the Transit Gateway#
 ##############################################
 
-  TransitGatewayAttachmentSeoulVPCPART1:
+  TransitGatewayAttachmentSeoulVPCPARTPRD:
     Type: "AWS::EC2::TransitGatewayAttachment"
     Properties:
       SubnetIds:
@@ -59,11 +59,11 @@ Resources:
   TransitGatewayRouteTableAssociationSeoulVPCPART1:
     Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
     Properties:
-      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPART1
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPARTPRD
       TransitGatewayRouteTableId: !Ref TransitGatewayRouteTablePART1
 
   TransitGatewayRouteTablePropagationSeoulVPCPART1:
     Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
     Properties:
-      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPART1
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPARTPRD
       TransitGatewayRouteTableId: !Ref TransitGatewayRouteTablePART1

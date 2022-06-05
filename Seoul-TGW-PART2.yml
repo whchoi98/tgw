@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Add Transit Gateway and TG Basic Config"
+
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: "VPC Parameters"
+        Parameters:
+          - AvailabilityZoneA
+
+Resources:
+#########################
+# Create-TransitGateWay #
+#########################
+  TransitGatewaySeoulPART2:
+    Type: "AWS::EC2::TransitGateway"
+    Properties:
+      AmazonSideAsn: 65003
+      Description: "TGW Route IntraPeering for the Seoul PART2 TGW"
+      AutoAcceptSharedAttachments: "enable"
+      DefaultRouteTableAssociation: "disable"
+      DefaultRouteTablePropagation: "disable"
+      MulticastSupport: enable
+      DnsSupport: "enable"
+      VpnEcmpSupport: "enable"
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}'
+
+####################################
+# Create-TransitGateWay-RouteTable #
+####################################
+
+  TransitGatewayRouteTablePART2:
+    Type: "AWS::EC2::TransitGatewayRouteTable"
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-RT-PART2'
+      TransitGatewayId: !Ref TransitGatewaySeoulPART2
+
+####################################################
+# Seoul-VPC-PART-STG Connect to the Transit Gateway#
+####################################################
+
+  TransitGatewayAttachmentSeoulVPCPARTSTG:
+    Type: "AWS::EC2::TransitGatewayAttachment"
+    Properties:
+      SubnetIds:
+        - Fn::ImportValue: !Sub "Seoul-VPC-PART-STG-TGWSubnetA"
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Attach-Seoul-VPC-PART-STG'
+      TransitGatewayId: !Ref TransitGatewaySeoulPART2
+      VpcId:
+        Fn::ImportValue: !Sub "Seoul-VPC-PART-STG"
+
+  TransitGatewayRouteTableAssociationSeoulVPCPART2:
+    Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
+    Properties:
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPARTSTG
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTablePART2
+
+  TransitGatewayRouteTablePropagationSeoulVPCPART2:
+    Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
+    Properties:
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPARTSTG
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTablePART2
+
+####################################################
+# Seoul-VPC-PART-DEV Connect to the Transit Gateway#
+####################################################
+
+  TransitGatewayAttachmentSeoulVPCPARTDEV:
+    Type: "AWS::EC2::TransitGatewayAttachment"
+    Properties:
+      SubnetIds:
+        - Fn::ImportValue: !Sub "Seoul-VPC-PART-DEV-TGWSubnetA"
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Attach-Seoul-VPC-PART-DEV'
+      TransitGatewayId: !Ref TransitGatewaySeoulPART2
+      VpcId:
+        Fn::ImportValue: !Sub "Seoul-VPC-PART-DEV"
+
+  TransitGatewayRouteTableAssociationSeoulVPCPART2:
+    Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
+    Properties:
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPARTDEV
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTablePART2
+
+  TransitGatewayRouteTablePropagationSeoulVPCPART2:
+    Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
+    Properties:
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPARTDEV
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTablePART2
