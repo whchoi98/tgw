@@ -17,7 +17,7 @@ Resources:
     Type: "AWS::EC2::TransitGateway"
     Properties:
       AmazonSideAsn: 65002
-      Description: "TGW Route Integration Test"
+      Description: "TGW Route IntraPeering for the Seoul PART1 TGW"
       AutoAcceptSharedAttachments: "enable"
       DefaultRouteTableAssociation: "disable"
       DefaultRouteTablePropagation: "disable"
@@ -52,7 +52,7 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Attach-Seoul-VPC-PART-PRD'
-      TransitGatewayId: !Ref TransitGatewayRouteTablePART1
+      TransitGatewayId: !Ref TransitGatewaySeoulPART1
       VpcId:
         Fn::ImportValue: !Sub "Seoul-VPC-PART-PRD"
 
