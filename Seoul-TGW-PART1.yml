@@ -60,6 +60,7 @@ Resources:
     Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
     Properties:
       TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPART1
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTablePART1
 
   TransitGatewayRouteTablePropagationSeoulVPCPART1:
     Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
