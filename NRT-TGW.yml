@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Add Transit Gateway and TG Basic Config"
+
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: "VPC Parameters"
+        Parameters:
+          - AvailabilityZoneA
+
+Resources:
+#########################
+# Create-TransitGateWay #
+#########################
+  TransitGatewayNRT:
+    Type: "AWS::EC2::TransitGateway"
+    Properties:
+      AmazonSideAsn: 65001
+      Description: "TGW Route IntraPeering for the NRT TGW"
+      AutoAcceptSharedAttachments: "enable"
+      DefaultRouteTableAssociation: "disable"
+      DefaultRouteTablePropagation: "disable"
+      MulticastSupport: enable
+      DnsSupport: "enable"
+      VpnEcmpSupport: "enable"
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}'
+
+####################################
+# Create-TransitGateWay-RouteTable #
+####################################
+
+  TransitGatewayRouteTableNRT:
+    Type: "AWS::EC2::TransitGatewayRouteTable"
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-RT'
+      TransitGatewayId: !Ref TransitGatewayNRT
+
+####################################################
+# Seoul-VPC-PART-PRD Connect to the Transit Gateway#
+####################################################
+
+  TransitGatewayAttachmentNRTVPCPRD:
+    Type: "AWS::EC2::TransitGatewayAttachment"
+    Properties:
+      SubnetIds:
+        - Fn::ImportValue: !Sub "NRT-VPC-PRD-TGWSubnetA"
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Attach-NRT-VPC-PRD'
+      TransitGatewayId: !Ref TransitGatewayNRT
+      VpcId:
+        Fn::ImportValue: !Sub "NRT-VPC-PRD"
+
+  TransitGatewayRouteTableAssociationNRTVPCPRD:
+    Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
+    Properties:
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentNRTVPCPRD
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTableNRT
+
+  TransitGatewayRouteTablePropagationNRTVPCPRD:
+    Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
+    Properties:
+      TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentNRTVPCPRD
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTableNRT
