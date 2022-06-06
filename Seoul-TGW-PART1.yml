@@ -37,12 +37,12 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-RT-PART1'
+          Value: !Sub '${AWS::StackName}-RT'
       TransitGatewayId: !Ref TransitGatewaySeoulPART1
 
-##############################################
+####################################################
 # Seoul-VPC-PART-PRD Connect to the Transit Gateway#
-##############################################
+####################################################
 
   TransitGatewayAttachmentSeoulVPCPARTPRD:
     Type: "AWS::EC2::TransitGatewayAttachment"
