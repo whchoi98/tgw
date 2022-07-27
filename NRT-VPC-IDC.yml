@@ -401,7 +401,40 @@ Resources:
             sudo yum -y install iotop iperf3 iptraf tcpdump git bash-completion 
             sudo yum -y install httpd php mysql php-mysql 
             sudo yum -y install python-pip
-            sudo yum -y install nethogs iftop lnav nmon tmux wireshark vsftpd ftp
+            sudo yum -y install nethogs iftop lnav nmon tmux wireshark vsftpd ftp openswan
+            sudo systemctl start httpd
+            sudo systemctl enable httpd
+            cd /var/www/html/
+            sudo git clone https://github.com/whchoi98/ec2meta-webpage.git
+            sudo systemctl restart httpd
+            exit       
+
+  PublicAInstance2:
+    Type: AWS::EC2::Instance
+    DependsOn: PublicSubnetA
+    Properties:
+      SubnetId: !Ref PublicSubnetA
+      ImageId: !Ref LatestAmiId
+      PrivateIpAddress: 10.22.11.102
+      InstanceType: !Ref InstanceType
+      SecurityGroupIds: 
+        - Ref: PublicEC2SG
+      KeyName: !Ref KeyPair
+      IamInstanceProfile: !Ref InstanceProfileSSM
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Openswan-10.22.11.102'
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash
+            sudo yum -y update
+            sudo yum -y install yum-utils 
+            sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+            sudo yum -y install iotop iperf3 iptraf tcpdump git bash-completion 
+            sudo yum -y install httpd php mysql php-mysql 
+            sudo yum -y install python-pip
+            sudo yum -y install nethogs iftop lnav nmon tmux wireshark vsftpd ftp openswan
             sudo systemctl start httpd
             sudo systemctl enable httpd
             cd /var/www/html/

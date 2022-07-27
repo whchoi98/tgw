@@ -1,0 +1,131 @@
+TransitGateway Script
+
+# AWS CLI upgrade
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+source ~/.bashrc
+aws --version
+
+# aws cli 자동완성 설치 
+which aws_completer
+export PATH=/usr/local/bin:$PATH
+source ~/.bash_profile
+complete -C '/usr/local/bin/aws_completer' aws
+
+## ssh keygen , public key export
+ssh-keygen
+
+mv mykey ./mykey.pem
+chmod 400 ./mykey.pem
+aws ec2 import-key-pair --key-name "mykey" --public-key-material fileb://mykey.pub --region ap-northeast-2
+aws ec2 import-key-pair --key-name "mykey" --public-key-material fileb://mykey.pub --region us-east-1
+
+# git clone
+cd ~/environment
+git clone https://github.com/whchoi98/tgw.git
+
+## 생성된 버킷에 clone한 파일들을 업로드 합니다.
+## S3 Bucket 생성합니다.
+## Bucket name은 고유해야 합니다.
+cd ~/environment/tgw
+export bucket_name="whchoi20220605"
+echo "export bucket_name=${bucket_name}" | tee -a ~/.bash_profile
+aws s3 mb s3://${bucket_name}
+
+# Cloud9에서 변경되는 파일을 S3와 동기화 합니다. 
+aws s3 sync ./ s3://${bucket_name}
+
+#TGW 구성
+aws cloudformation deploy \
+  --stack-name "Seoul-VPC-HQ" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-VPC-HQ.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=mykey"
+
+aws cloudformation deploy \
+  --stack-name "Seoul-VPC-PRD" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-VPC-PRD.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=mykey"
+
+aws cloudformation deploy \
+  --stack-name "Seoul-VPC-STG" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-VPC-STG.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=mykey"
+
+aws cloudformation deploy \
+  --stack-name "Seoul-VPC-DEV" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-VPC-DEV.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=mykey"
+
+aws cloudformation deploy \
+  --stack-name "Seoul-TGW" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-TGW.yml" \
+  --capabilities CAPABILITY_NAMED_IAM
+
+# TGW MultiAccount
+
+aws cloudformation deploy \
+  --stack-name "Seoul-VPC-PART" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-VPC-PART.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=mykey"
+
+# TGW Intra-Peering
+aws cloudformation deploy \
+  --stack-name "Seoul-VPC-PART-PRD" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-VPC-PART-PRD.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=mykey"
+
+
+aws cloudformation deploy \
+  --stack-name "Seoul-VPC-PART-STG" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-VPC-PART-STG.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=mykey"
+
+aws cloudformation deploy \
+  --stack-name "Seoul-VPC-PART-DEV" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-VPC-PART-DEV.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=mykey"
+
+aws cloudformation deploy \
+  --stack-name "Seoul-TGW-PART1" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-TGW-PART1.yml" \
+  --capabilities CAPABILITY_NAMED_IAM
+
+aws cloudformation deploy \
+  --stack-name "Seoul-TGW-PART2" \
+  --template-file "/home/ec2-user/environment/tgw/Seoul-TGW-PART2.yml" \
+  --capabilities CAPABILITY_NAMED_IAM
+
+aws cloudformation deploy \
+  --stack-name "NRT-VPC-PRD" \
+  --template-file "/home/ec2-user/environment/tgw/NRT-VPC-PRD.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=MAR-2022-whchoi" \
+  --region "ap-northeast-1"
+
+aws cloudformation deploy \
+  --stack-name "NRT-VPC-IDC" \
+  --template-file "/home/ec2-user/environment/tgw/NRT-VPC-IDC.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "KeyPair=MAR-2022-whchoi" \
+  --region "ap-northeast-1"
+
+aws cloudformation deploy \
+  --stack-name "NRT-TGW" \
+  --template-file "/home/ec2-user/environment/tgw/NRT-TGW.yml" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --region "ap-northeast-1"
+
+
+
+cisco_CSR-16.09.08-BYOL-624f5bb1-7f8e-4f7c-ad2c-03ae1cd1c2d3
+ami-03b149ecfa0505c27
+ssh -i ~/Dropbox/01.AWS/00.aws_keypair/MAR-2022-whchoi.pem -oKexAlgorithms=diffie-hellman-group-exchange-sha1 ec2-user@3.114.122.20
