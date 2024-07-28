@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Add Transit Gateway and TG Basic Config"
+Description: "Add Transit Gateway and TG Basic Config with Appliance Mode"
 
 Metadata:
   "AWS::CloudFormation::Interface":
@@ -17,14 +17,14 @@ Resources:
     Type: "AWS::EC2::TransitGateway"
     Properties:
       AmazonSideAsn: 65001
-      Description: "TGW Route Integration Test"
+      Description: "TGW Route Integration Test with Appliance Mode"
       AutoAcceptSharedAttachments: "enable"
       DefaultRouteTableAssociation: "disable"
       DefaultRouteTablePropagation: "disable"
-      MulticastSupport: enable
+      MulticastSupport: "enable"
       DnsSupport: "enable"
       VpnEcmpSupport: "enable"
-      ApplianceModeSupport: "enable"  # Appliance Mode 활성화
+      ApplianceModeSupport: "enable"  # Appliance Mode 활성화 / Enable Appliance Mode
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}'
@@ -33,6 +33,7 @@ Resources:
 # Create-TransitGateWay-RouteTable #
 ####################################
 
+  # East to West 트래픽을 위한 TGW 라우트 테이블 / TGW route table for East to West traffic
   TransitGatewayRouteTableEastToWest:
     Type: "AWS::EC2::TransitGatewayRouteTable"
     Properties:
@@ -41,6 +42,7 @@ Resources:
           Value: !Sub '${AWS::StackName}-RT-East-To-West'
       TransitGatewayId: !Ref TransitGatewaySeoul
 
+  # North to South 트래픽을 위한 TGW 라우트 테이블 / TGW route table for North to South traffic
   TransitGatewayRouteTableNorthToSouth:
     Type: "AWS::EC2::TransitGatewayRouteTable"
     Properties:
@@ -53,6 +55,7 @@ Resources:
 # Seoul-VPC-HQ Connect to the Transit Gateway#
 ##############################################
 
+  # Seoul VPC HQ와 TGW 간의 연결 구성 / Attach Seoul VPC HQ to TGW
   TransitGatewayAttachmentSeoulVPCHQ:
     Type: "AWS::EC2::TransitGatewayAttachment"
     Properties:
@@ -65,12 +68,14 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "Seoul-VPC-HQ"
 
+  # Seoul VPC HQ를 North to South 라우트 테이블에 연결 / Associate Seoul VPC HQ with North to South route table
   TransitGatewayRouteTableAssociationSeoulVPCHQNorthToSouth:
     Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
     Properties:
       TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCHQ
       TransitGatewayRouteTableId: !Ref TransitGatewayRouteTableNorthToSouth
 
+  # Seoul VPC HQ 트래픽을 North to South 라우트 테이블로 전파 / Propagate Seoul VPC HQ traffic to North to South route table
   TransitGatewayRouteTablePropagationSeoulVPCHQNorthToSouth:
     Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
     Properties:
@@ -81,6 +86,7 @@ Resources:
 # Seoul-VPC-PRD Connect to the Transit Gateway#
 ##############################################
 
+  # Seoul VPC PRD와 TGW 간의 연결 구성 / Attach Seoul VPC PRD to TGW
   TransitGatewayAttachmentSeoulVPCPRD:
     Type: "AWS::EC2::TransitGatewayAttachment"
     Properties:
@@ -93,12 +99,14 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "Seoul-VPC-PRD"
 
+  # Seoul VPC PRD를 East to West 라우트 테이블에 연결 / Associate Seoul VPC PRD with East to West route table
   TransitGatewayRouteTableAssociationSeoulVPCPRDEastToWest:
     Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
     Properties:
       TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCPRD
       TransitGatewayRouteTableId: !Ref TransitGatewayRouteTableEastToWest
 
+  # Seoul VPC PRD 트래픽을 East to West 라우트 테이블로 전파 / Propagate Seoul VPC PRD traffic to East to West route table
   TransitGatewayRouteTablePropagationSeoulVPCPRDEastToWest:
     Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
     Properties:
@@ -109,6 +117,7 @@ Resources:
 # Seoul-VPC-STG Connect to the Transit Gateway#
 ##############################################
 
+  # Seoul VPC STG와 TGW 간의 연결 구성 / Attach Seoul VPC STG to TGW
   TransitGatewayAttachmentSeoulVPCSTG:
     Type: "AWS::EC2::TransitGatewayAttachment"
     Properties:
@@ -121,12 +130,14 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "Seoul-VPC-STG"
 
+  # Seoul VPC STG를 East to West 라우트 테이블에 연결 / Associate Seoul VPC STG with East to West route table
   TransitGatewayRouteTableAssociationSeoulVPCSTGEastToWest:
     Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
     Properties:
       TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCSTG
       TransitGatewayRouteTableId: !Ref TransitGatewayRouteTableEastToWest
 
+  # Seoul VPC STG 트래픽을 East to West 라우트 테이블로 전파 / Propagate Seoul VPC STG traffic to East to West route table
   TransitGatewayRouteTablePropagationSeoulVPCSTGEastToWest:
     Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
     Properties:
@@ -137,6 +148,7 @@ Resources:
 # Seoul-VPC-DEV Connect to the Transit Gateway#
 ##############################################
 
+  # Seoul VPC DEV와 TGW 간의 연결 구성 / Attach Seoul VPC DEV to TGW
   TransitGatewayAttachmentSeoulVPCDEV:
     Type: "AWS::EC2::TransitGatewayAttachment"
     Properties:
@@ -149,12 +161,14 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "Seoul-VPC-DEV"
 
+  # Seoul VPC DEV를 East to West 라우트 테이블에 연결 / Associate Seoul VPC DEV with East to West route table
   TransitGatewayRouteTableAssociationSeoulVPCDEVEastToWest:
     Type: "AWS::EC2::TransitGatewayRouteTableAssociation"
     Properties:
       TransitGatewayAttachmentId: !Ref TransitGatewayAttachmentSeoulVPCDEV
       TransitGatewayRouteTableId: !Ref TransitGatewayRouteTableEastToWest
 
+  # Seoul VPC DEV 트래픽을 East to West 라우트 테이블로 전파 / Propagate Seoul VPC DEV traffic to East to West route table
   TransitGatewayRouteTablePropagationSeoulVPCDEVEastToWest:
     Type: "AWS::EC2::TransitGatewayRouteTablePropagation"
     Properties:
