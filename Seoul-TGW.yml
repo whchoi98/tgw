@@ -24,6 +24,7 @@ Resources:
       MulticastSupport: enable
       DnsSupport: "enable"
       VpnEcmpSupport: "enable"
+      ApplianceModeSupport: "enable"  # Appliance Mode 활성화
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}'
