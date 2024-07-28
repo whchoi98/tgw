@@ -52,10 +52,10 @@ Parameters:
 # Create-Keypair : EC2 Keypair #
 ################################
 
-  KeyPair:
-    Description: "Keypair to access the EC2 Instance"
-    Type: "AWS::EC2::KeyPair::KeyName"
-    Default: "mykey"
+#  KeyPair:
+#    Description: "Keypair to access the EC2 Instance"
+#    Type: "AWS::EC2::KeyPair::KeyName"
+#    Default: "mykey"
 
 ##########################
 # Create-AMI: EC2 AMI ID #
@@ -386,7 +386,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PublicEC2SG
-      KeyName: !Ref KeyPair
+ #      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       Tags:
         - Key: Name
@@ -423,7 +423,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      KeyName: !Ref KeyPair
+ #      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       Tags:
         - Key: Name
